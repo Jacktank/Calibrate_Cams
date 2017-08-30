@@ -33,7 +33,7 @@ void InitCorners3D(std::vector<std::vector<cv::Point3f> >& Corners3D, CvSize Che
 int main()
 {
 		std::vector<std::string> vstring;
-		vstring.push_back(std::string("rtsp://admin:12345goccia@10.0.0.107:554//Streaming/Channels/1"));
+		vstring.push_back(std::string("rtsp://admin:12345goccia@10.0.0.104:554//Streaming/Channels/1"));
 		//vstring.push_back(std::string("rtsp://admin:12345goccia@10.0.0.105:554//Streaming/Channels/1"));
 
 		std::vector<cv::VideoCapture> vcap;
