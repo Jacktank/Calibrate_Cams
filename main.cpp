@@ -1,11 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 
 using namespace cv;
-
 
 void InitCorners3D(std::vector<std::vector<cv::Point3f> >& Corners3D, CvSize ChessBoardSize, int NImages_succeed, float SquareSize)
 {
@@ -33,8 +33,8 @@ void InitCorners3D(std::vector<std::vector<cv::Point3f> >& Corners3D, CvSize Che
 int main()
 {
 		std::vector<std::string> vstring;
-		vstring.push_back(std::string("rtsp://admin:12345goccia@10.0.0.104:554//Streaming/Channels/1"));
-		vstring.push_back(std::string("rtsp://admin:12345goccia@10.0.0.105:554//Streaming/Channels/1"));
+		vstring.push_back(std::string("rtsp://admin:12345goccia@10.0.0.107:554//Streaming/Channels/1"));
+		//vstring.push_back(std::string("rtsp://admin:12345goccia@10.0.0.105:554//Streaming/Channels/1"));
 
 		std::vector<cv::VideoCapture> vcap;
 		for(int i=0;i<vstring.size();i++)
@@ -50,7 +50,6 @@ int main()
 
 		std::vector<cv::Mat> vm, vm_display, vm_small;
 
-		//std::vector<std::vector<cv::Point2f>> imagePoints[2];
 		std::vector<std::vector<cv::Point3f> > objectPoints(1);	
 		std::vector<std::vector<std::vector<cv::Point2f> > > imagePoints;
 		imagePoints.resize(vcap.size());
@@ -145,20 +144,16 @@ int main()
 															
 						}
 
-						std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
 						if(pts.size() != vm.size())
 						{
 								std::cout<<"-------------------------"<<std::endl;
 								continue;
 						}
 						
-						std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
 						for(int i=0;i<pts.size();i++)
 						{
 								imagePoints[i].push_back(pts[i]);
 						}
-
-						std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
 
 						for(int i=0;i<vm.size();i++)
 						{					  
@@ -187,8 +182,6 @@ int main()
 								cv::waitKey(0);		
 						}
 
-						std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
-						
 						save_count++;
 
 				}
@@ -198,15 +191,11 @@ int main()
 				}
 
 		}
-						
-		std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
 		
 		std::vector<cv::Mat> Ms,Ds;
 		std::vector<Mat> Rs,Ts;
 	
 		InitCorners3D(objectPoints, sz, save_count, SquareSize);
-		
-		std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
 		
 		for(int i=0;i<imagePoints.size();i++)
 		{
@@ -232,8 +221,6 @@ int main()
 	//	{
 	//			std::cout<<"reprojErr-:"<<i<<":"<<reprojErrs[i]<<std::endl;
 	//	}
-
-		std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
 		
 		cv::FileStorage fs(fileSave,cv::FileStorage::WRITE|cv::FileStorage::FORMAT_XML);
 		fs<<"Width"<<nx;
@@ -241,8 +228,6 @@ int main()
 		fs<<"SquareSize"<<SquareSize;
 		fs <<"image_width"<<imageSize.width;
 		fs <<"image_height"<<imageSize.height;
-
-		std::cout<<"File:"<<__FILE__<<", line:"<<__LINE__<<std::endl;
 		
 		for(int i=0;i<imagePoints.size();i++)
 		{
@@ -259,6 +244,11 @@ int main()
 				fs<<str<<Ds[i];
 		}
 
+		fs.release();
+
+		std::cout << "calibration done..." << std::endl;
+
+#if 0	
 		std::cout << "Running stereo calibration ..." << std::endl;
 
 		cv::Mat R, T, E, F, P1, P2, R_l, R_r, H1, H2, Q;
@@ -267,13 +257,12 @@ int main()
 								imageSize, R, T, E, F, cv::CALIB_FIX_K3 + cv::CALIB_FIX_K4 + cv::CALIB_FIX_K5,
 								cv::TermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 100, 1e-5));
 
-		/*FileStorage fs("SingleCalibrate.xml", FileStorage::WRITE);
-		fs << "M1" << M1 << "D1" << D1 << "M2" << M2 << "D2" << D2;
-		fs.release();*/
+		//FileStorage fs("SingleCalibrate.xml", FileStorage::WRITE);
+		//fs << "M1" << M1 << "D1" << D1 << "M2" << M2 << "D2" << D2;
+		//fs.release();
 
 		std::cout << "Please wait for output of calibration XML file" << std::endl;
 
-#ifdef	ERROR_CALIBRATION
 
 		double avgErr = 0;
 		for (int i = 0; i < total_num_image; i++)
@@ -300,6 +289,7 @@ int main()
 
 #endif
 
+#if 0 
 		cv::Rect validRoi[2];
 		cv::Mat mx1, mx2, my1, my2;
 	
@@ -325,6 +315,8 @@ int main()
 		cv::imshow("origin1", vm[1]);
 		cv::imshow("after1", dst1);
 		cv::waitKey(0);
+#endif
 
 		return 0;
 }
+
